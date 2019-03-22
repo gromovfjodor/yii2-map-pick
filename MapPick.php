@@ -142,34 +142,35 @@ class MapPick extends Widget
 	private function getInit() {
 		$js = '
 			ymaps.ready(init_[%ID%]);
-			var my_[%ID%];
+			var my_map[%ID%];
 			
 			function init_[%ID%]() {
-			    my_[%ID%] = new ymaps.Map("[%ID%]", {
-			        center: [[%LAT%], [%LON%]], // Углич
-			        zoom: [%ZOOM%],
-			        controls:[],
-			        behaviors: [\'default\', \'scrollZoom\']
-			    });
-			        my_[%ID%].controls.add(\'typeSelector\');
-			        my_[%ID%].behaviors.disable(\'drag\');
-                    my_[%ID%].behaviors.disable(\'scrollZoom\');
-			    }
+			    my_map[%ID%] = new ymaps.Map("[%ID%]", 
+                    {
+                        center: [[%LAT%], [%LON%]], // Углич
+                        zoom: [%ZOOM%],
+                        controls:[],
+                        behaviors: [\'default\', \'scrollZoom\']
+                    });
+                    myMap.controls.add(\'typeSelector\');
+                    myMap.behaviors.disable(\'drag\');
+                    myMap.behaviors.disable(\'scrollZoom\');
+                }  
 				
 				var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
-				my_[%ID%].geoObjects.add(mark_[%ID%]);				
+				my_map[%ID%].geoObjects.add(mark_[%ID%]);				
 								
 			
-			    my_[%ID%].events.add("click", function (e) {
+			    my_map[%ID%].events.add("click", function (e) {
 			        var coords = e.get(\'coords\');
 					mark_[%ID%].geometry.setCoordinates(coords);
 					
-					var zoom = my_[%ID%].getZoom();
+					var zoom = my_map[%ID%].getZoom();
 					var lat = coords[0].toPrecision(10);
 					var lon = coords[1].toPrecision(10);
 					
 					
-					my_[%ID%]_click(lat, lon, zoom); 
+					my_map[%ID%]_click(lat, lon, zoom); 
 			    });
 			}				
 		';
