@@ -150,9 +150,9 @@ class MapPick extends Widget
 			        zoom: [%ZOOM%],
 			        controls:[],
 			        behaviors: [\'default\', \'scrollZoom\']});
-			        my_[%ID%]..controls.add(\'typeSelector\');
-			        myMap.behaviors.disable(\'drag\');
-                    myMap.behaviors.disable(\'scrollZoom\');
+			        my_[%ID%].controls.add(\'typeSelector\');
+			        my_[%ID%].behaviors.disable(\'drag\');
+                    my_[%ID%].behaviors.disable(\'scrollZoom\');
 			    });
 				
 				var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
