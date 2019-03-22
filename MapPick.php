@@ -149,11 +149,12 @@ class MapPick extends Widget
 			        center: [[%LAT%], [%LON%]], // Углич
 			        zoom: [%ZOOM%],
 			        controls:[],
-			        behaviors: [\'default\', \'scrollZoom\']});
+			        behaviors: [\'default\', \'scrollZoom\']
+			    });
 			        my_[%ID%].controls.add(\'typeSelector\');
 			        my_[%ID%].behaviors.disable(\'drag\');
                     my_[%ID%].behaviors.disable(\'scrollZoom\');
-			    });
+			    }
 				
 				var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
 				my_[%ID%].geoObjects.add(mark_[%ID%]);				
