@@ -46,7 +46,7 @@ class MapPick extends Widget
 	public $options = [];
 	public $attributes = [];
 	public $callback = '';
-	public $language = 'en_US';
+	public $language = 'ru_RU';
 	
     /**
      * @var array of the options for the Yandex Maps API.
@@ -60,7 +60,7 @@ class MapPick extends Widget
 	private function initDefaults() {
 		if(!isset($this->options['id'])) $this->options['id'] = 'ymaps_'.substr(md5(time()),0,6);
 		
-		if(empty($this->language)) $this->language = 'en_US';
+		if(empty($this->language)) $this->language = 'ru_RU';
 		
 		$modelClass = "";
 		if(!empty($this->model)) {
@@ -120,6 +120,7 @@ class MapPick extends Widget
      * Registers Yandex Map object and events
      */
     protected function registerClientScript() {
+		
         $view = $this->getView();
 		
 		$url = '//api-maps.yandex.ru/2.1/?lang='.$this->language;
@@ -131,11 +132,13 @@ class MapPick extends Widget
     }
 	
 	private function getDefaultCallback() {
-		$js = "function(lat, lon, zoom) {";
+		$js = "function(lat, lon, name, zoom) {";
 		foreach($this->attributes as $key=>$attr)
 			$js .= "\n\t".'$("input#'.$attr['id'].'").val('.$key.');';
+            $js .= "\n\t".'$("input#'.$attr['name'].'").val('.$key.');';
 		$js .= "\n}";
 		$js = str_replace('[%ID%]', $this->options['id'], $js);
+        $js = str_replace('[%NAME%]', $this->options['name'], $js);
 		return $js;		
 	}
 
@@ -161,7 +164,7 @@ class MapPick extends Widget
 					
 					function search(){
 					  //заносим текст формы в переменную
-					  var t = document.getElementById(\'country - name\').value;
+					  var t = document.getElementById(\'[%NAME%]\').value;
 					  ymaps.geocode(t,{results:1}).then(
 						function(res){  
 							var MyGeoObj = res.geoObjects.get(0);
@@ -196,16 +199,14 @@ class MapPick extends Widget
 					$(\'#country-name\').on(\'keyup change\', function(){
 						return search();
 					})
-
-                }
-                
-            })
-
+								
+				}			
+			})
 		';
 		$id = $this->options['id'];
-		$lat = (!empty($this->attributes['lat']['value'])) ? $this->attributes['lat']['value'] : 0;
-		$lon = (!empty($this->attributes['lon']['value'])) ? $this->attributes['lon']['value'] : 0;
-		$zoom = (!empty($this->attributes['zoom']['value'])) ? $this->attributes['zoom']['value'] : 0; 
+		$lat = (!empty($this->attributes['lat']['value'])) ? $this->attributes['lat']['value'] : 61.698653;
+		$lon = (!empty($this->attributes['lon']['value'])) ? $this->attributes['lon']['value'] : 99.505405;
+		$zoom = (!empty($this->attributes['zoom']['value'])) ? $this->attributes['zoom']['value'] : 2; 
 		
 		return str_replace(
 			["[%ID%]", "[%LAT%]", "[%LON%]", "[%ZOOM%]"], 
