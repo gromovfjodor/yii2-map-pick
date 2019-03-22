@@ -141,38 +141,66 @@ class MapPick extends Widget
 
 	private function getInit() {
 		$js = '
-			ymaps.ready(init_[%ID%]);
-			var my_map[%ID%];
-			
-			function init_[%ID%]() {
-			    my_map[%ID%] = new ymaps.Map("[%ID%]", 
-                    {
-                        center: [[%LAT%], [%LON%]], // Углич
-                        zoom: [%ZOOM%],
-                        controls:[],
-                        behaviors: [\'default\', \'scrollZoom\']
-                    });
-                    myMap.controls.add(\'typeSelector\');
-                    myMap.behaviors.disable(\'drag\');
-                    myMap.behaviors.disable(\'scrollZoom\');
-                }  
+			$(document).ready(function(){
 				
-				var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
-				my_map[%ID%].geoObjects.add(mark_[%ID%]);				
-								
-			
-			    my_map[%ID%].events.add("click", function (e) {
-			        var coords = e.get(\'coords\');
-					mark_[%ID%].geometry.setCoordinates(coords);
+				ymaps.ready(init_[%ID%]);
+				var my_map[%ID%];
+				
+				function init_[%ID%]() {
+					my_[%ID%] = new ymaps.Map("[%ID%]", 
+					{
+						center: [[%LAT%], [%LON%]], 
+						zoom: [%ZOOM%],
+						controls:[],
+						
+					});
 					
-					var zoom = my_map[%ID%].getZoom();
-					var lat = coords[0].toPrecision(10);
-					var lon = coords[1].toPrecision(10);
+					my_[%ID%].controls.add(\'typeSelector\');
+					my_[%ID%].behaviors.disable(\'drag\');
+					my_[%ID%].behaviors.disable(\'scrollZoom\');
+					
+					function search(){
+					  //заносим текст формы в переменную
+					  var t = document.getElementById(\'country - name\').value;
+					  ymaps.geocode(t,{results:1}).then(
+						function(res){  
+							var MyGeoObj = res.geoObjects.get(0);
+							//извлечение координат
+							document.getElementById(\'CountryLatitude\').value = MyGeoObj.geometry.getCoordinates()[0];
+							document.getElementById(\'CountryLongitude\').value = MyGeoObj.geometry.getCoordinates()[1];
+							//Центрируем карту
+							my_[%ID%].setCenter([MyGeoObj.geometry.getCoordinates()[0],MyGeoObj.geometry.getCoordinates()[1]], 8);
+							//Удаляем лишние метки
+							my_[%ID%].geoObjects.removeAll();
+							//добавляем метку на карте
+							var myPlacemark = new ymaps.Placemark([MyGeoObj.geometry.getCoordinates()[0], MyGeoObj.geometry.getCoordinates()[1]]);
+							my_[%ID%].geoObjects.add(myPlacemark);
+						});
+				
+
+					}
+					
+					var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
+					my_[%ID%].geoObjects.add(mark_[%ID%]);	
+
+					my_[%ID%].events.add("click", function (e) {
+						var coords = e.get(\'coords\');
+						mark_[%ID%].geometry.setCoordinates(coords);
+						var zoom = my_[%ID%].getZoom();
+						var lat = coords[0].toPrecision(10);
+						var lon = coords[1].toPrecision(10);
+						my_[%ID%]_click(lat, lon, zoom); 
+					});
 					
 					
-					my_map[%ID%]_click(lat, lon, zoom); 
-			    });
-			}				
+					$(\'#country-name\').on(\'keyup change\', function(){
+						return search();
+					})
+
+                }
+                
+            })
+
 		';
 		$id = $this->options['id'];
 		$lat = (!empty($this->attributes['lat']['value'])) ? $this->attributes['lat']['value'] : 0;
