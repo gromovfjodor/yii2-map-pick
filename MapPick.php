@@ -138,7 +138,7 @@ class MapPick extends Widget
 		$js = str_replace('[%ID%]', $this->options['id'], $js);
 		return $js;		
 	}
-	
+
 	private function getInit() {
 		$js = '
 			ymaps.ready(init_[%ID%]);
@@ -147,7 +147,12 @@ class MapPick extends Widget
 			function init_[%ID%]() {
 			    my_[%ID%] = new ymaps.Map("[%ID%]", {
 			        center: [[%LAT%], [%LON%]], // Углич
-			        zoom: [%ZOOM%]
+			        zoom: [%ZOOM%],
+			        controls:[],
+			        behaviors: [\'default\', \'scrollZoom\']});
+			        my_[%ID%]..controls.add(\'typeSelector\');
+			        myMap.behaviors.disable(\'drag\');
+                    myMap.behaviors.disable(\'scrollZoom\');
 			    });
 				
 				var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);

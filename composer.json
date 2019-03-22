@@ -1,6 +1,6 @@
 {
     "name": "gromovfjodor/yii2-map-pick",
-	"version":"1.0.0",
+	"version":"1.0.6",
     "description": "Coordinates picker widget for Yii2.",
     "type": "yii2-extension",
     "keywords": [
@@ -14,6 +14,7 @@
     "authors": [
         {
             "name": "gromovfjodor",
+            "email": "gromovfjodor@ro.ru",
             "role": "Developer"
         }
     ],
