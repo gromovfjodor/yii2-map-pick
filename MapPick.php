@@ -132,13 +132,11 @@ class MapPick extends Widget
     }
 	
 	private function getDefaultCallback() {
-		$js = "function(lat, lon, name, zoom) {";
+		$js = "function(lat, lon, zoom) {";
 		foreach($this->attributes as $key=>$attr)
 			$js .= "\n\t".'$("input#'.$attr['id'].'").val('.$key.');';
-            $js .= "\n\t".'$("input#'.$attr['name'].'").val('.$key.');';
 		$js .= "\n}";
 		$js = str_replace('[%ID%]', $this->options['id'], $js);
-        $js = str_replace('[%NAME%]', $this->options['name'], $js);
 		return $js;		
 	}
 
@@ -164,7 +162,7 @@ class MapPick extends Widget
 					
 					function search(){
 					  //заносим текст формы в переменную
-					  var t = document.getElementById(\'[%NAME%]\').value;
+					  var t = document.getElementById(\'country-name\').value;
 					  ymaps.geocode(t,{results:1}).then(
 						function(res){  
 							var MyGeoObj = res.geoObjects.get(0);
