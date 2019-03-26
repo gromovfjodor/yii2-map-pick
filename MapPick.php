@@ -152,6 +152,7 @@ class MapPick extends Widget
 				var my_map[%ID%];
 				
 				function init_[%ID%]() {
+		
 					my_[%ID%] = new ymaps.Map("[%ID%]", 
 					{
 						center: [[%LAT%], [%LON%]], 
@@ -159,7 +160,7 @@ class MapPick extends Widget
 						controls:[],
 						
 					});
-					
+				
 					my_[%ID%].controls.add(\'typeSelector\');
 					my_[%ID%].behaviors.disable(\'drag\');
 					my_[%ID%].behaviors.disable(\'scrollZoom\');
@@ -167,7 +168,7 @@ class MapPick extends Widget
 					var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
 					my_[%ID%].geoObjects.add(mark_[%ID%]);	
 					
-					function search(){
+					function countrySearch(){
 						//заносим текст формы в переменную
 						var t = document.getElementById(\'[%NAMEID%]\').value;
 						ymaps.geocode(t,{results:1}).then(
@@ -184,21 +185,101 @@ class MapPick extends Widget
 							var myPlacemark = new ymaps.Placemark([MyGeoObj.geometry.getCoordinates()[0], MyGeoObj.geometry.getCoordinates()[1]]);
 							my_[%ID%].geoObjects.add(myPlacemark);
 						});
+						
+							
 					}
-				
-					$(\'#country-name\').on(\'keyup change\', function(){
-						return search();
-					});					
 					
-					my_[%ID%].events.add("click", function(e) {
-						var coords = e.get(\'coords\');
-						mark_[%ID%].geometry.setCoordinates(coords);
-						var zoom = my_[%ID%].getZoom();
-						var lat = coords[0].toPrecision(10);
-						var lon = coords[1].toPrecision(10);
-						my_[%ID%]_click(lat, lon, zoom); 
-					});
+					$(\'#[%NAMEID%]\').on(\'keyup\', function(){
+						return countrySearch();
+					});	
+					
+					function regionSearch(){
+						//заносим текст формы в переменную
+						var t = document.getElementById(\'[%NAMEID%]\').value;
+						ymaps.geocode(t,{results:1}).then(
+						function(res){  
+							var MyGeoObj = res.geoObjects.get(0);
+							//извлечение координат
+							document.getElementById(\'[%LATID%]\').value = MyGeoObj.geometry.getCoordinates()[0];
+							document.getElementById(\'[%LONID%]\').value = MyGeoObj.geometry.getCoordinates()[1];
+							//Центрируем карту
+							my_[%ID%].setCenter([MyGeoObj.geometry.getCoordinates()[0],MyGeoObj.geometry.getCoordinates()[1]], 8);
+							//Удаляем лишние метки
+							my_[%ID%].geoObjects.removeAll();
+							//добавляем метку на карте
+							var myPlacemark = new ymaps.Placemark([MyGeoObj.geometry.getCoordinates()[0], MyGeoObj.geometry.getCoordinates()[1]]);
+							my_[%ID%].geoObjects.add(myPlacemark);
+						});
+						
+						$("#[%COUNTRYLIST%], #[%NAMEID%]").on(\'keyup\', function() {
+							let country = $(\'#[%COUNTRYLIST%] option:selected\').text();
+							let region = $(\'#[%NAMEID%]\').val();
+							let a = country+region;
+							$(\'#[%HIDDEN%]\').val(a)
+						});
+					 
+						$.valHooks.input = {
+						
+							get: function(a) {
+								return a.value
+							},
+							
+							set: function(a, b) {
+								let c = a.value;
+								a.value = b;
+								"[%HIDDEN%]" == a.id && c !== b && $(a).trigger("change")
+							}
+						};
+						
+					}	
+
+					function citySearch(){
+						//заносим текст формы в переменную
+						var t = document.getElementById(\'[%NAMEID%]\').value;
+						ymaps.geocode(t,{results:1}).then(
+						function(res){  
+							var MyGeoObj = res.geoObjects.get(0);
+							//извлечение координат
+							document.getElementById(\'[%LATID%]\').value = MyGeoObj.geometry.getCoordinates()[0];
+							document.getElementById(\'[%LONID%]\').value = MyGeoObj.geometry.getCoordinates()[1];
+							//Центрируем карту
+							my_[%ID%].setCenter([MyGeoObj.geometry.getCoordinates()[0],MyGeoObj.geometry.getCoordinates()[1]], 8);
+							//Удаляем лишние метки
+							my_[%ID%].geoObjects.removeAll();
+							//добавляем метку на карте
+							var myPlacemark = new ymaps.Placemark([MyGeoObj.geometry.getCoordinates()[0], MyGeoObj.geometry.getCoordinates()[1]]);
+							my_[%ID%].geoObjects.add(myPlacemark);
+						});
+						
+						$("#[%COUNTRYLIST%], #[%REGIONLIST%], #[%NAMEID%]").on(\'keyup\', function() {
+							let country = $(\'#[%COUNTRYLIST%] option:selected\').text();
+							let region = $(\'#[%REGIONLIST%] option:selected\').text();
+							let city = $(\'#[%NAMEID%]\').val();
+							let a = country+region+city;
+							$(\'#[%HIDDEN%]\').val(a)
+						});
+					 
+						$.valHooks.input = {
+						
+							get: function(a) {
+								return a.value
+							},
+							
+							set: function(a, b) {
+								let c = a.value;
+								a.value = b;
+								"[%HIDDEN%]" == a.id && c !== b && $(a).trigger("change")
+							}
+						};
+						
+					}		
 				
+					
+					$(\'#[%HIDDEN%]\').on(\'keyup\', function(){
+						return citySearch();
+					});
+									
+							
 				}	
 				
 			})
@@ -206,6 +287,9 @@ class MapPick extends Widget
 
         $latId = $this->params['latId'];
         $lonId = $this->params['lonId'];
+        $countryList = $this->params['countryList'];
+        $regionList = $this->params['regionList'];
+        $hidden = $this->params['hidden'];
         $nameId = $this->params['nameId'];
         $id = $this->options['id'];
         $lat = (!empty($this->attributes['lat']['value'])) ? $this->attributes['lat']['value'] : 61.698653;
@@ -213,8 +297,8 @@ class MapPick extends Widget
         $zoom = (!empty($this->attributes['zoom']['value'])) ? $this->attributes['zoom']['value'] : 2;
 
         return str_replace(
-            ["[%LATID%]", "[%LONID%]", "[%NAMEID%]", "[%ID%]", "[%LAT%]", "[%LON%]", "[%ZOOM%]"],
-            [$latId, $lonId, $nameId, $id, $lat, $lon, $zoom],
+            ["[%LATID%]", "[%LONID%]", "[%COUNTRYLIST%]", "[%REGIONLIST%]", "[%HIDDEN%]", "[%NAMEID%]", "[%ID%]", "[%LAT%]", "[%LON%]", "[%ZOOM%]"],
+            [$latId, $lonId, $countryList, $regionList, $hidden, $nameId, $id, $lat, $lon, $zoom],
             $js);
     }
 }
