@@ -1,11 +1,5 @@
 <?php
 /**
- * @copyright Copyright (c) 2016 Nastya Kizza
- * @link http://macrodigital.ru
- * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- */
-
-/**
  * Usage:
  * <?= MapPick::widget([
  * 	'model'=>'model',
@@ -168,7 +162,7 @@ class MapPick extends Widget
 					var mark_[%ID%] = new ymaps.Placemark([[%LAT%], [%LON%]]);
 					my_[%ID%].geoObjects.add(mark_[%ID%]);	
 					
-					function countrySearch(){
+					function search(){
 						//заносим текст формы в переменную
 						var t = document.getElementById(\'[%NAMEID%]\').value;
 						ymaps.geocode(t,{results:1}).then(
@@ -188,98 +182,12 @@ class MapPick extends Widget
 						
 							
 					}
-					
-					$(\'#[%NAMEID%]\').on(\'keyup\', function(){
-						return countrySearch();
-					});	
-					
-					function regionSearch(){
-						//заносим текст формы в переменную
-						var t = document.getElementById(\'[%NAMEID%]\').value;
-						ymaps.geocode(t,{results:1}).then(
-						function(res){  
-							var MyGeoObj = res.geoObjects.get(0);
-							//извлечение координат
-							document.getElementById(\'[%LATID%]\').value = MyGeoObj.geometry.getCoordinates()[0];
-							document.getElementById(\'[%LONID%]\').value = MyGeoObj.geometry.getCoordinates()[1];
-							//Центрируем карту
-							my_[%ID%].setCenter([MyGeoObj.geometry.getCoordinates()[0],MyGeoObj.geometry.getCoordinates()[1]], 8);
-							//Удаляем лишние метки
-							my_[%ID%].geoObjects.removeAll();
-							//добавляем метку на карте
-							var myPlacemark = new ymaps.Placemark([MyGeoObj.geometry.getCoordinates()[0], MyGeoObj.geometry.getCoordinates()[1]]);
-							my_[%ID%].geoObjects.add(myPlacemark);
-						});
-						
-						$("#[%COUNTRYLIST%], #[%NAMEID%]").on(\'keyup\', function() {
-							let country = $(\'#[%COUNTRYLIST%] option:selected\').text();
-							let region = $(\'#[%NAMEID%]\').val();
-							let a = country+region;
-							$(\'#[%HIDDEN%]\').val(a)
-						});
-					 
-						$.valHooks.input = {
-						
-							get: function(a) {
-								return a.value
-							},
-							
-							set: function(a, b) {
-								let c = a.value;
-								a.value = b;
-								"[%HIDDEN%]" == a.id && c !== b && $(a).trigger("change")
-							}
-						};
-						
-					}	
-
-					function citySearch(){
-						//заносим текст формы в переменную
-						var t = document.getElementById(\'[%NAMEID%]\').value;
-						ymaps.geocode(t,{results:1}).then(
-						function(res){  
-							var MyGeoObj = res.geoObjects.get(0);
-							//извлечение координат
-							document.getElementById(\'[%LATID%]\').value = MyGeoObj.geometry.getCoordinates()[0];
-							document.getElementById(\'[%LONID%]\').value = MyGeoObj.geometry.getCoordinates()[1];
-							//Центрируем карту
-							my_[%ID%].setCenter([MyGeoObj.geometry.getCoordinates()[0],MyGeoObj.geometry.getCoordinates()[1]], 8);
-							//Удаляем лишние метки
-							my_[%ID%].geoObjects.removeAll();
-							//добавляем метку на карте
-							var myPlacemark = new ymaps.Placemark([MyGeoObj.geometry.getCoordinates()[0], MyGeoObj.geometry.getCoordinates()[1]]);
-							my_[%ID%].geoObjects.add(myPlacemark);
-						});
-						
-						$("#[%COUNTRYLIST%], #[%REGIONLIST%], #[%NAMEID%]").on(\'keyup\', function() {
-							let country = $(\'#[%COUNTRYLIST%] option:selected\').text();
-							let region = $(\'#[%REGIONLIST%] option:selected\').text();
-							let city = $(\'#[%NAMEID%]\').val();
-							let a = country+region+city;
-							$(\'#[%HIDDEN%]\').val(a)
-						});
-					 
-						$.valHooks.input = {
-						
-							get: function(a) {
-								return a.value
-							},
-							
-							set: function(a, b) {
-								let c = a.value;
-								a.value = b;
-								"[%HIDDEN%]" == a.id && c !== b && $(a).trigger("change")
-							}
-						};
-						
-					}		
-				
-					
-					$(\'#[%HIDDEN%]\').on(\'keyup\', function(){
-						return citySearch();
+										
+					$(\'#[%NAMEID%]\').on("keyup", function(){
+						return search();
 					});
-									
-							
+	
+			
 				}	
 				
 			})
@@ -287,9 +195,6 @@ class MapPick extends Widget
 
         $latId = $this->params['latId'];
         $lonId = $this->params['lonId'];
-        $countryList = $this->params['countryList'];
-        $regionList = $this->params['regionList'];
-        $hidden = $this->params['hidden'];
         $nameId = $this->params['nameId'];
         $id = $this->options['id'];
         $lat = (!empty($this->attributes['lat']['value'])) ? $this->attributes['lat']['value'] : 61.698653;
@@ -297,8 +202,8 @@ class MapPick extends Widget
         $zoom = (!empty($this->attributes['zoom']['value'])) ? $this->attributes['zoom']['value'] : 2;
 
         return str_replace(
-            ["[%LATID%]", "[%LONID%]", "[%COUNTRYLIST%]", "[%REGIONLIST%]", "[%HIDDEN%]", "[%NAMEID%]", "[%ID%]", "[%LAT%]", "[%LON%]", "[%ZOOM%]"],
-            [$latId, $lonId, $countryList, $regionList, $hidden, $nameId, $id, $lat, $lon, $zoom],
+            ["[%LATID%]", "[%LONID%]", "[%NAMEID%]", "[%ID%]", "[%LAT%]", "[%LON%]", "[%ZOOM%]"],
+            [$latId, $lonId, $nameId, $id, $lat, $lon, $zoom],
             $js);
     }
 }
